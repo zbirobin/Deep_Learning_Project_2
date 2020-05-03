@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from torch import empty
 
-from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid
+from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid, lossMSE, dlossMSE
 
 class Module(ABC):
     
@@ -15,7 +15,11 @@ class Module(ABC):
     
     @abstractmethod
     def param(self):
-        pass   
+        pass
+    
+    @abstractmethod
+    def update_param(self, eta):
+        pass
     
 class Sequential(Module):
     
@@ -40,6 +44,10 @@ class Sequential(Module):
         for module in self.modules:
             params.append(module.param())
         return params
+    
+    def update_param(self, eta):
+        for module in self.modules:
+            module.update_param(eta)
     
 class Linear(Module):
     
@@ -73,6 +81,11 @@ class Linear(Module):
     
     def param(self):
         return [(self.weights, self.weights_grad), (self.bias, self.bias_grad)]
+    
+    def update_param(self, eta):
+        self.weights -= eta * self.weights_grad
+        self.bias -= eta * self.bias_grad
+        
 
 # Activations functions modules
 
@@ -96,6 +109,10 @@ class ReLU(Module):
         print(self.name + " has no parameters")
         return None
     
+    def update_param(self, eta):
+        return None
+    
+    
 class Tanh(Module):
     
     def __init__(self):
@@ -114,6 +131,9 @@ class Tanh(Module):
     
     def param(self):
         print(self.name + " has no parameters")
+        return None
+    
+    def update_param(self, eta):
         return None
     
 class Sigmoid(Module):
@@ -135,3 +155,30 @@ class Sigmoid(Module):
     def param(self):
         print(self.name + " has no parameters")
         return None
+    
+    def update_param(self, eta):
+        return None
+    
+# Loss module
+class LossMSE():
+    def __init__(self):
+        self.output = None
+        self.target = None
+        self.loss = None
+        self.name = "MSE Loss"
+    
+    def compute_loss(self, output, target):
+        self.output = output
+        self.target = target
+        self.loss = lossMSE(self.output, self.target)
+        return self.loss
+    
+    def backward(self, gradwrtoutput = 1):
+        if ((self.target == None) | (self.output == None)):
+            print("Compute loss first.")
+            return None
+        
+        return dlossMSE(self.output, self.target)
+    
+    
+    
