@@ -3,6 +3,7 @@ from torch import empty
 
 from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid, lossMSE, dlossMSE
 
+
 class Module(ABC):
     
     @abstractmethod
@@ -20,7 +21,8 @@ class Module(ABC):
     @abstractmethod
     def update_param(self, eta):
         pass
-    
+
+
 class Sequential(Module):
     
     def __init__(self, *modules):
@@ -48,7 +50,12 @@ class Sequential(Module):
     def update_param(self, eta):
         for module in self.modules:
             module.update_param(eta)
-    
+            
+    def zero_grad(self):
+        for module in self.modules:
+            module.zero_grad()
+
+
 class Linear(Module):
     
     def __init__(self, input_dim, output_dim):
@@ -57,8 +64,8 @@ class Linear(Module):
         self.input = None
         
         self.weights, self.bias = self.__init_parameters()
-        self.weights_grad = None
-        self.bias_grad = None
+        self.weights_grad = 0
+        self.bias_grad = 0
         self.name = "Linear({}x{})".format(self.input_dim, self.output_dim)
         
     def __init_parameters(self):
@@ -73,8 +80,8 @@ class Linear(Module):
         
     def backward(self, gradwrtoutput):
         if self.input is not None:
-            self.bias_grad = gradwrtoutput
-            self.weights_grad = gradwrtoutput.view(-1, 1).mm(self.input.view(1, -1))
+            self.bias_grad += gradwrtoutput
+            self.weights_grad += gradwrtoutput.view(-1, 1).mm(self.input.view(1, -1))
             return self.weights.t().mv(gradwrtoutput)
         else:
             raise Exception("Forward must be called before backward for " + self.name)
@@ -85,6 +92,10 @@ class Linear(Module):
     def update_param(self, eta):
         self.weights -= eta * self.weights_grad
         self.bias -= eta * self.bias_grad
+    
+    def zero_grad(self):
+        self.weights_grad = 0
+        self.bias_grad = 0
         
 
 # Activations functions modules
@@ -110,9 +121,12 @@ class ReLU(Module):
         return None
     
     def update_param(self, eta):
-        return None
+        pass
     
-    
+    def zero_grad(self):
+        pass
+
+
 class Tanh(Module):
     
     def __init__(self):
@@ -134,8 +148,12 @@ class Tanh(Module):
         return None
     
     def update_param(self, eta):
-        return None
+        pass    
     
+    def zero_grad(self):
+        pass
+
+
 class Sigmoid(Module):
     
     def __init__(self):
@@ -157,28 +175,27 @@ class Sigmoid(Module):
         return None
     
     def update_param(self, eta):
-        return None
+        pass
     
-# Loss module
-class LossMSE():
+    def zero_grad(self):
+        pass
+
+
+# MSE Loss, not a module
+class LossMSE:
+    
     def __init__(self):
         self.output = None
         self.target = None
-        self.loss = None
         self.name = "MSE Loss"
     
     def compute_loss(self, output, target):
         self.output = output
         self.target = target
-        self.loss = lossMSE(self.output, self.target)
-        return self.loss
+        return lossMSE(self.output, self.target)
     
-    def backward(self, gradwrtoutput = 1):
-        if ((self.target == None) | (self.output == None)):
-            print("Compute loss first.")
-            return None
+    def gradient(self):
+        if not self.target or not self.output:
+            raise Exception("The loss must be computed first for " + self.name)
         
         return dlossMSE(self.output, self.target)
-    
-    
-    
