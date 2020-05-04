@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from torch import empty
 
-from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid, lossMSE, dlossMSE
+from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid
 
 
 class Module(ABC):
@@ -179,23 +179,3 @@ class Sigmoid(Module):
     
     def zero_grad(self):
         pass
-
-
-# MSE Loss, not a module
-class LossMSE:
-    
-    def __init__(self):
-        self.output = None
-        self.target = None
-        self.name = "MSE Loss"
-    
-    def compute_loss(self, output, target):
-        self.output = output
-        self.target = target
-        return lossMSE(self.output, self.target)
-    
-    def gradient(self):
-        if not self.target or not self.output:
-            raise Exception("The loss must be computed first for " + self.name)
-        
-        return dlossMSE(self.output, self.target)
