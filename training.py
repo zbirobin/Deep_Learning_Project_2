@@ -1,4 +1,3 @@
-from random import sample
 from torch import empty
 
 from functional import lossMSE, dlossMSE, lossMAE, dlossMAE
@@ -11,38 +10,29 @@ def one_hot_encode(target):
     return ohe_target
 
 
-def train_model_SGD(model, train_input, train_target, nb_epoch=25, mini_batch_size=1):
+def train_model_SGD(model, train_input, train_target, nb_epoch=25, mini_batch_size=10):
     nb_train_samples = train_input.shape[0]
     ohe_train_target = one_hot_encode(train_target)
     mse = LossMSE()
-    eta = 1e-1 / nb_train_samples
+    eta = 1e-3
     nb_batch_per_epoch = nb_train_samples // mini_batch_size
-    losses = empty(nb_epoch, nb_batch_per_epoch)
     for epoch in range(nb_epoch):
-        for batch in range(nb_batch_per_epoch):
-            loss = 0
-            indices = sample(range(nb_train_samples), mini_batch_size)
-            for i in indices:
-                # Run forward pass
-                output = model.forward(train_input[i])
-                # Compute loss
-                loss += mse.compute_loss(output, ohe_train_target[i])
-                # Run back propagation
-                model.backward(mse.gradient())
+        loss = 0
+        for b in range(0, nb_train_samples, mini_batch_size):
+            output = model.forward(train_input.narrow(0, b, mini_batch_size))
+            # Compute the loss
+            loss += mse.compute_loss(output, ohe_train_target.narrow(0, b, mini_batch_size))
+            # Run back propagation
+            model.backward(mse.gradient())
 
-            loss /= nb_batch_per_epoch
-            losses[epoch][batch] = loss
             model.update_param(eta)
-            model.zero_grad()
 
-        mean_loss = losses.mean(1)[epoch]
+        mean_loss = loss/nb_batch_per_epoch
         print(f"Epoch: {epoch}, Mean loss: {mean_loss}")
 
 
 def accuracy(model, input, target):
-    output = empty(input.shape[0], 2)
-    for n in range(output.shape[0]):
-        output[n] = model.forward(input[n])
+    output = model.forward(input)
     return (output.argmax(1) == target).sum() / float(output.shape[0])
 
 
@@ -56,8 +46,8 @@ class LossMSE:
         self.name = "MSE Loss"
 
     def compute_loss(self, output, target):
-        self.output = output
-        self.target = target
+        self.output = output.clone()
+        self.target = target.clone()
         return lossMSE(self.output, self.target)
 
     def gradient(self):
@@ -75,8 +65,8 @@ class LossMAE:
         self.name = "MAE Loss"
 
     def compute_loss(self, output, target):
-        self.output = output
-        self.target = target
+        self.output = output.clone()
+        self.target = target.clone()
         return lossMAE(self.output, self.target)
 
     def gradient(self):
