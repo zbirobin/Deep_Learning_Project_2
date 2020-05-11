@@ -1,3 +1,6 @@
+# Helpers methods
+
+
 # Activations functions and its derivatives
 
 def tanh(x):
@@ -27,7 +30,7 @@ def drelu(x):
 # Losses and its derivatives
 
 def lossMSE(v, t):
-    return (v - t).pow(2).sum()
+    return (v - t).pow(2).mean()
 
 
 def dlossMSE(v, t):
@@ -35,7 +38,7 @@ def dlossMSE(v, t):
 
 
 def lossMAE(v, t):
-    return (v - t).abs().sum()
+    return (v - t).abs().mean()
 
 
 def dlossMAE(v, t):
