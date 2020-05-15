@@ -1,3 +1,4 @@
+import math
 from torch import empty
 
 from functional import lossMSE, dlossMSE, lossMAE, dlossMAE
@@ -63,6 +64,11 @@ def train_model_SGD(model, train_input, train_target, nb_epoch=25, mini_batch_si
             model.backward(loss_function.gradient())
             # Update the parameters
             model.update_param(lr)
+
+        if math.isnan(loss):
+            print("The loss has diverged to infinity, you should maybe decrease " +
+                  "the value of the learning rate or change one of the activation functions.")
+            return loss
 
         # Update the learning rate
         if learning_rate_type == "decay":
