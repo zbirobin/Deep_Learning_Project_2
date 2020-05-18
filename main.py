@@ -9,9 +9,9 @@ train_input, train_target, test_input, test_target = generate_data(N, normalize=
 
 # Builds a network with three hidden layer of size 25 using sequential Linear modules and activation functions
 l1 = Linear(2,25)
-a1 = Sigmoid()
+a1 = ReLU()
 l2 = Linear(25, 25)
-a2 = Sigmoid()
+a2 = Tanh()
 l3 = Linear(25, 25)
 a3 = Sigmoid()
 l4 = Linear(25, 2)
