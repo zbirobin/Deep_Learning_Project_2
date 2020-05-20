@@ -4,6 +4,76 @@ from torch import empty
 from functional import lossMSE, dlossMSE, lossMAE, dlossMAE
 
 
+# Losses classes
+
+class LossMSE:
+    """Class representing a Mean Squared Loss."""
+
+    def __init__(self):
+        """Builds the Mean Squared Loss instance.
+        """
+        self.output = None
+        self.target = None
+        self.name = "MSE Loss"
+
+    def compute_loss(self, output, target):
+        """Computes the Mean Squared Loss w.r.t the output and target.
+
+        :param output: Tensor of output values
+        :param target: Tensor of target values
+        :return: MSE loss
+        """
+        self.output = output.clone()
+        self.target = target.clone()
+        return lossMSE(self.output, self.target)
+
+    def gradient(self):
+        """Computes the gradient of the Mean Square Loss w.r.t. to the output and target used when
+        compute_loss was called, then compute_loss must be called before gradient.
+
+        :return: The gradient
+        """
+        if self.target is None or self.output is None:
+            raise Exception("The loss must be computed first for " + self.name)
+
+        return dlossMSE(self.output, self.target)
+
+
+class LossMAE:
+    """Class representing a Mean Absolute Loss."""
+
+    def __init__(self):
+        """Builds the Mean Absolute Loss instance.
+        """
+        self.output = None
+        self.target = None
+        self.name = "MAE Loss"
+
+    def compute_loss(self, output, target):
+        """Computes the Mean Absolute Loss w.r.t the output and target.
+
+        :param output: Tensor of output values
+        :param target: Tensor of target values
+        :return: MSE loss
+        """
+        self.output = output.clone()
+        self.target = target.clone()
+        return lossMAE(self.output, self.target)
+
+    def gradient(self):
+        """Computes the gradient of the Mean Absolute Loss w.r.t. to the output and target used when
+        compute_loss was called, therefore compute_loss must be called before gradient.
+
+        :return: The gradient
+        """
+        if self.target is None or self.output is None:
+            raise Exception("The loss must be computed first for " + self.name)
+
+        return dlossMAE(self.output, self.target)
+    
+
+# Training functions
+
 def one_hot_encode(target):
     """One hot encodes the target set.
 
@@ -94,71 +164,3 @@ def accuracy(model, input, target):
     """
     output = model.forward(input)
     return (output.argmax(1) == target).sum() / float(output.shape[0])
-
-
-# Losses classes
-
-class LossMSE:
-    """Class representing a Mean Squared Loss."""
-
-    def __init__(self):
-        """Builds the Mean Squared Loss instance.
-        """
-        self.output = None
-        self.target = None
-        self.name = "MSE Loss"
-
-    def compute_loss(self, output, target):
-        """Computes the Mean Squared Loss w.r.t the output and target.
-
-        :param output: Tensor of output values
-        :param target: Tensor of target values
-        :return: MSE loss
-        """
-        self.output = output.clone()
-        self.target = target.clone()
-        return lossMSE(self.output, self.target)
-
-    def gradient(self):
-        """Computes the gradient of the Mean Square Loss w.r.t. to the output and target used when
-        compute_loss was called, then compute_loss must be called before gradient.
-
-        :return: The gradient
-        """
-        if self.target is None or self.output is None:
-            raise Exception("The loss must be computed first for " + self.name)
-
-        return dlossMSE(self.output, self.target)
-
-
-class LossMAE:
-    """Class representing a Mean Absolute Loss."""
-
-    def __init__(self):
-        """Builds the Mean Absolute Loss instance.
-        """
-        self.output = None
-        self.target = None
-        self.name = "MAE Loss"
-
-    def compute_loss(self, output, target):
-        """Computes the Mean Absolute Loss w.r.t the output and target.
-
-        :param output: Tensor of output values
-        :param target: Tensor of target values
-        :return: MSE loss
-        """
-        self.output = output.clone()
-        self.target = target.clone()
-        return lossMAE(self.output, self.target)
-
-    def gradient(self):
-        """Computes the gradient of the Mean Absolute Loss w.r.t. to the output and target used when
-        compute_loss was called, therefore compute_loss must be called before gradient.
-
-        :return: The gradient
-        """
-        if self.target is None or self.output is None:
-            raise Exception("The loss must be computed first for " + self.name)
-
-        return dlossMAE(self.output, self.target)
