@@ -11,7 +11,7 @@ def generate_quarter_disc_set(N):
     """
 
     input = empty(N, 2).uniform_(0, 1)
-    target = input.pow(2).sum(1).sub(1 / math.sqrt(2 * math.pi)).sign().add(1).div(2).long()
+    target = input.sub(0.5).pow(2).sum(1).sqrt().sub(1 / math.sqrt(2 * math.pi)).sign().add(1).div(2).long()
     return input, target
 
 

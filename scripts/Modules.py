@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from torch import empty
 
-from functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid
+from scripts.functional import relu, drelu, tanh, dtanh, sigmoid, dsigmoid
 
 
 class Module(ABC):
@@ -131,9 +131,10 @@ class Linear(Module):
     def param(self):
         """Returns the parameters of the layer.
 
-        :return: [Tensor weights matrix (input_dim x output_dim), Tensor bias (output_dim)]
+        :return: [(Weights matrix (input_dim x output_dim), Gradients weights matrix (input_dim x output_dim)), 
+                    (Bias vector (output_dim), Gradients bias vector (output_dim))]
         """
-        return [self.weights, self.bias]
+        return [(self.weights, self.weights_grad), (self.bias, self.bias_grad)]
 
     def update_param(self, eta):
         """Updates the parameters of the layer using the gradient descent rule with learning rate eta.
