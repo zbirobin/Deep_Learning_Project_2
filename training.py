@@ -118,13 +118,22 @@ def train_model_SGD(model, train_input, train_target, nb_epoch=25, mini_batch_si
 
     # Verify the learning rate type
     if learning_rate_type in ["constant", "decay"]:
-        lr = learning_rate
+        constant_lr = learning_rate
     else:
         raise ValueError(str(learning_rate_type) + " is an unknown learning rate type.")
-
+        
+    # Keep log of the losses for each epoch
     losses = []
+    
     for epoch in range(nb_epoch):
         loss = 0
+        
+        # Update the learning rate with respect to type of learning rate and the mini batch size
+        if learning_rate_type == "decay":
+            lr = constant_lr/(epoch * mini_batch_size)
+        else : 
+            lr = constant_lr/mini_batch_size
+
         for batch in range(0, nb_train_samples, mini_batch_size):
             # Run forward pass
             output = model.forward(train_input.narrow(0, batch, mini_batch_size))
@@ -139,10 +148,6 @@ def train_model_SGD(model, train_input, train_target, nb_epoch=25, mini_batch_si
             print("The loss has diverged to infinity, you should maybe decrease " +
                   "the value of the learning rate or change one of the activation functions.")
             return loss
-
-        # Update the learning rate
-        if learning_rate_type == "decay":
-            lr /= epoch * nb_train_samples
 
         # Print the loss and the accuracy
         if verbose and epoch % 5 == 0:

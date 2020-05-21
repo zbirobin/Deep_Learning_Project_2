@@ -18,7 +18,7 @@ l4 = Linear(25, 2)
 model = Sequential(l1, a1, l2, a2, l3, a3, l4)
 
 # Train the model using MSE and logging the losses (verbose = True)
-losses = train_model_SGD(model, train_input, train_target, nb_epoch=300, learning_rate=1e-3, mini_batch_size=100, verbose=True)
+losses = train_model_SGD(model, train_input, train_target, nb_epoch=300, learning_rate=1e-1, mini_batch_size=100, verbose=True)
 
 # Compute and print the final train and test accuracy
 print("\nFinal train accuracy : " + str(accuracy(model, train_input, train_target).item()*100)[:5] + "%")
