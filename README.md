@@ -24,6 +24,6 @@ To use this framework, please follow the indications in the `report.pdf` file.
 
 `training.py` contains the classes and functions to train the model and to test it, e.g., `LossMSE`, `train_model_SGD`, `accuracy`,...
 
-`plots.ipynb` shows how we obtain the figures and plots in the `report.pdf` file.
+`main.ipynb` shows how we obtain the results obtained in the `report.pdf` file.
 
 `test.py` is a script to test on a simple dataset this framework by using a simple neural network and training it
