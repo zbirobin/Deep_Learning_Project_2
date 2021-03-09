@@ -1,5 +1,4 @@
 # Mini Deep Learning framework
-Project 2 of Deep Learning course (EE559) at EPFL,
 
 _by Jalel Zgonda, Jonathan Labhard, Robin Zbinden_
 
