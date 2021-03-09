@@ -12,7 +12,7 @@ Run the script `test.py` to test on a simple dataset this framework with:
 ```
 python test.py
 ```
-To use this framework, please follow the indications in the `report.pdf` file.   
+To use this framework, please follow the indications in the `report_project.pdf` file.   
     
 ## Detailed file description
 
