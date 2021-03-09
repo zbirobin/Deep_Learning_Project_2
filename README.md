@@ -4,7 +4,7 @@ Project 2 of Deep Learning course (EE559) at EPFL,
 _by Jalel Zgonda, Jonathan Labhard, Robin Zbinden_
 
 
-The goal of this project is to design a mini "deep learning framework" using only pytorch's tensor operations and the standard math library. More about this project can be read in the `report.pdf` file.
+The goal of this project is to design a mini "deep learning framework" using only pytorch's tensor operations and the standard math library. More about this project can be read in the `report_project.pdf` file.
 
 ## Usage
 
